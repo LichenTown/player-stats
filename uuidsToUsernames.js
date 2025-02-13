@@ -20,7 +20,7 @@ if (fs.existsSync(usernameMapPath)) {
 async function getUsername(uuid) {
   try {
     const response = await fetch(
-      `https://sessionserver.mojang.com/session/minecraft/profile/${uuid}`
+      `https://corsjangsessionserver.b-cdn.net/session/minecraft/profile/${uuid}`
     );
     const data = await response.json();
     return data.name;
