@@ -50,7 +50,6 @@ jobs:
 
           async function getUsername(uuid) {
             try {
-              // Use the correct Mojang API endpoint (no proxy needed)
               const response = await fetch(`https://sessionserver.mojang.com/session/minecraft/profile/${uuid}`);
               if (!response.ok) {
                 if (response.status === 429) {
@@ -77,16 +76,22 @@ jobs:
               console.error("Error reading username map:", error);
             }
 
-            const files = await fs.readdir(statsDir);
-            for (const file of files) {
-              if (path.extname(file) === '.json') {
-                const uuid = file.slice(0, -5);
-                if (!usernameMap[uuid] || usernameMap[uuid] === "??") {
-                  const username = await getUsername(uuid);
-                  if (username !== null) {
-                    usernameMap[uuid] = username;
-                    console.log(`Mapped UUID ${uuid} to username ${username}`);
-                  }
+            let uuids = [];
+            try {
+                if (await fs.stat(uuidListPath).catch(() => false)) {
+                  uuids = JSON.parse(await fs.readFile(uuidListPath, 'utf8'));
+                }
+            } catch (error){
+                console.error("Error reading UUID list", error);
+                process.exit(1);
+            }
+
+            for (const uuid of uuids) {
+              if (!usernameMap[uuid] || usernameMap[uuid] === "??") {
+                const username = await getUsername(uuid);
+                if (username !== null) {
+                  usernameMap[uuid] = username;
+                  console.log(`Mapped UUID ${uuid} to username ${username}`);
                 }
               }
             }
