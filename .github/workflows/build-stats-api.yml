@@ -43,7 +43,7 @@ jobs:
 
       - name: Update Username Map
         run: |
-          node <<EOF
+          node <<'EOF'
           const fs = require('fs').promises;
           const path = require('path');
           const fetch = require('node-fetch');
@@ -64,6 +64,7 @@ jobs:
               const data = await response.json();
               return data.name;
             } catch (error) {
+              console.error(`Error fetching username for ${uuid}:`, error);
               return "??";
             }
           }
@@ -75,6 +76,7 @@ jobs:
                 usernameMap = JSON.parse(await fs.readFile(usernameMapPath, 'utf8'));
               }
             } catch (error) {
+              console.error("Error reading username map:", error);
             }
 
             let uuids = [];
@@ -83,6 +85,7 @@ jobs:
                   uuids = JSON.parse(await fs.readFile(uuidListPath, 'utf8'));
                 }
             } catch (error){
+                console.error("Error reading UUID list", error);
                 process.exit(1);
             }
 
@@ -101,9 +104,11 @@ jobs:
           }
 
           updateUsernameMap().catch(err => {
+              console.error("Unhandled error in updateUsernameMap:", err);
               process.exit(1);
           });
           EOF
+
       - name: Commit and Push
         run: |
           git config --global user.name "GitHub Actions"
