@@ -45,7 +45,7 @@ jobs:
           const path = require('path');
           const fetch = require('node-fetch');
 
-          const statsDir = path.join(process.cwd(), 'stats');
+          const uuidListPath = path.join(process.cwd(), 'uuid-list.json');
           const usernameMapPath = path.join(process.cwd(), 'username_map.json');
 
           async function getUsername(uuid) {
